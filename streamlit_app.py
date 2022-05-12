@@ -40,6 +40,7 @@ def subsample(samples, newsamples):
 
 #local testing mode for limited ram deployment.
 path = "./testmat.pb"
+urllib.request.urlretrieve("http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.metadata.tsv.gz", "public-latest.metadata.tsv.gz")
 with gzip.open('public-latest.metadata.tsv.gz', 'rb') as f_in:
     with open('public-latest.metadata.tsv', 'wb') as f_out:
         shutil.copyfileobj(f_in, f_out)
