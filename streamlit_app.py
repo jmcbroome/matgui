@@ -7,6 +7,7 @@ import datetime as dt
 import gzip
 import shutil
 import random
+import sys
 
 from streamlit.scriptrunner import get_script_run_ctx
 def _get_session():
@@ -53,29 +54,21 @@ pref = _get_session()
 if runbutton:
     retrieve_file(path)
     t = load_tree(path)
-    print(regex, clade, timestart, timeend, fformat)
     added = 0
     leaves = t.get_leaves_ids()
-    print('USA/CA-CDC-ASC210823926/2022|OM911122.1|2022-02-21' in leaves)
     samples = set(leaves)
-    print("Moving to filters.")
     if samplelist != "":    
-        print(samplelist.splitlines())
-        print(len(samples))
         samples = subsample(samples, samplelist.splitlines())
-        print(samples)
     if regex != "":
         st.write("Filtering {} samples by regex: {}".format(len(samples),regex))
         rsamples = t.get_regex_samples(regex)
         samples = subsample(samples, rsamples)
         st.write("Found",len(samples),"samples.")
-    print("Done with regex.", len(samples))
     if clade != "":
         st.write("Filtering {} samples by regex: {}".format(len(samples),regex))
         rsamples = t.get_clade_samples(clade)
         samples = subsample(samples, rsamples)
         st.write("Found",len(samples),"samples.")
-    print("Done with clade.", len(samples))
     if use_time:
         st.write("Filtering {} samples by time: {} to {}".format(len(samples),timestart,timeend))
         tsamples = []
@@ -88,14 +81,12 @@ if runbutton:
                 continue
         st.write("Found",len(tsamples),"samples.")
         samples = tsamples
-    print("Done with dates.", len(samples))
     if type(samples) == set:
         samples = list(samples)
     if len(samples) == 0:
         st.write("No samples found matching your selection parameters. Please try again.")
         st.stop()
     if scount != "" or background != "":
-        print("Doing random sampling.")
         if scount != "":
             target = int(scount)
             if target < len(samples):
@@ -111,10 +102,8 @@ if runbutton:
         subt = t.get_random(target, [s.encode("UTF-8") for s in samples])
     else:
         subt = t.subtree(samples)
-    print("Done with filtering. Looking to make output")
     if fformat == "Nextstrain JSON":
         st.write("Writing Nextstrain JSON file...")
-        print("Writing json.")
         mf = ['public-latest.metadata.tsv']
         if background != "":
             mf.append(pref + "_sel.txt")
@@ -124,7 +113,7 @@ if runbutton:
         with open(pref+'_subt.json', 'r') as f:
             db = st.download_button(label="Download Results", file_name="matgui.json", data=f.read())
             if db:
-                print("Clearing temporary files.")
+                print("Clearing temporary files.",file=sys.stderr)
                 for seshfile in [pref+"_sel.txt", pref+"_subt.json"]:
                     if os.path.exists(seshfile):
                         os.remove(seshfile)
@@ -136,7 +125,7 @@ if runbutton:
         with open(pref+'_subt.pb', 'rb') as f:
             db = st.download_button(label="Download Results", file_name="matgui.pb", data=f.read())
             if db:
-                print("Clearing temporary files.")
+                print("Clearing temporary files.",file=sys.stderr)
                 for seshfile in [pref+"_subt.pb"]:
                     if os.path.exists(seshfile):
                         os.remove(seshfile)
