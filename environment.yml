@@ -1,6 +1,8 @@
 name: matgui
 channels:
+  - anaconda
   - conda-forge
   - bioconda
 dependencies:
+  - python=3.8
   - bte
