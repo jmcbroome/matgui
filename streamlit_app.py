@@ -17,7 +17,10 @@ def retrieve_file(fn):
         st.write("Data successfully downloaded!")
 
 with st.form(key="matgui"):
-    testmode = st.checkbox("Test Mode- use small test dataset?",value=False)
+    st.markdown("# MATGUI")
+    st.markdown("This is a test deployment environment for the MATGUI project.")
+    st.markdown("This deployment uses a limited test dataset to demonstrate the functionality of the MATGUI project.")
+    st.markdown("A full version of the project using the complete dataset is forthcoming.")
     regex = st.text_input("What samples would you like to include? Pass a valid regex matching your full sample names here (e.g. USA.* matches all samples from the USA)")
     scount = st.text_input("How many samples would you like to include?")
     clade = st.text_input("Would you like to pick a specific clade to use? E.g. B.1.1.7, B.A.2")
@@ -35,13 +38,8 @@ def load_tree(path):
 def subsample(samples, newsamples):
     return samples.intersection(set([s.decode("UTF-8") for s in newsamples]))
 
-if testmode:
-    path = "./testmat.pb"
-else:
-    path = "public-latest.all.masked.pb"
+path = "./testmat.pb"
 if runbutton:
-    if not testmode:
-        retrieve_file(path)
     t = load_tree(path)
     print(regex, clade, timestart, timeend, fformat)
     added = 0
