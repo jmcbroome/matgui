@@ -1,4 +1,3 @@
-from numpy import std
 import streamlit as st
 import bte
 import os
@@ -7,6 +6,7 @@ import datetime as dt
 import gzip
 import shutil
 import random
+import sys
 
 from streamlit.scriptrunner import get_script_run_ctx
 def _get_session():
@@ -31,7 +31,7 @@ with st.form(key="matgui"):
     st.markdown("WARNING: This test deployment uses a limited dataset of 50,000 samples to demonstrate the functionality of the MATGUI project.")
     st.markdown("A full version of the project using the complete dataset is forthcoming.")
     st.markdown("The Nextstrain JSON files produced by this tool can be uploaded to [Auspice](https://auspice.us/) for viewing. Set your parameters and generate, download the result, then drag and drop onto Auspice!")
-    samplelist = st.text_area("Paste a list of samples to include, one per line.")
+    samplelist = st.text_area("Paste a list of samples to include, one per line. Default checks all available samples for matching criteria.")
     regex = st.text_input("What category of sample names would you like to include? Pass a valid regex matching your full sample names of interest here (e.g. USA.* matches all samples from the USA)")
     clade = st.text_input("Would you like to select a specific clade? E.g. B.1.1.7, B.A.2")
     use_time = st.checkbox("Use time-based filtering?")
@@ -61,28 +61,22 @@ pref = _get_session()
 if runbutton:
     retrieve_file(path)
     t = load_tree(path)
-    print(regex, clade, timestart, timeend, fformat)
     leaves = t.get_leaves_ids()
-    print('USA/CA-CDC-ASC210823926/2022|OM911122.1|2022-02-21' in leaves)
+    st.write("The current dataset contains {} samples.".format(len(leaves)))
     samples = set(leaves)
-    print("Moving to filters.")
-    if samplelist != "":    
-        print(samplelist.splitlines())
-        print(len(samples))
+    if samplelist != "":
         samples = subsample(samples, samplelist.splitlines())
-        print(samples)
+        st.write("Input sample list contains {} samples. Proceeding to check criteria".format(len(samples)))
     if regex != "":
         st.write("Filtering {} samples by regex: {}".format(len(samples),regex))
         rsamples = t.get_regex_samples(regex)
         samples = subsample(samples, rsamples)
-        st.write("Found",len(samples),"samples.")
-    print("Done with regex.", len(samples))
+        st.write(len(samples),"match critera.")
     if clade != "":
-        st.write("Filtering {} samples by regex: {}".format(len(samples),regex))
+        st.write("Filtering {} samples by clade: {}".format(len(samples),clade))
         rsamples = t.get_clade_samples(clade)
         samples = subsample(samples, rsamples)
-        st.write("Found",len(samples),"samples.")
-    print("Done with clade.", len(samples))
+        st.write(len(samples),"match critera.")
     if use_time:
         st.write("Filtering {} samples by time: {} to {}".format(len(samples),timestart,timeend))
         tsamples = []
@@ -93,23 +87,26 @@ if runbutton:
                     tsamples.append(s)
             except:
                 continue
-        st.write("Found",len(tsamples),"samples.")
+        st.write(len(samples),"match critera.")
         samples = tsamples
-    print("Done with dates.", len(samples))
     if type(samples) == set:
         samples = list(samples)
     if len(samples) == 0:
         st.write("No samples found matching your selection parameters. Please try again.")
         st.stop()
     if scount != "" or background != "":
-        print("Doing random sampling.")
         if scount != "":
             target = int(scount)
             if target < len(samples):
+                st.write("{} samples match all criteria with {} requested; removing {} samples from the set at random.".format(len(samples),target,len(samples)-target))
                 samples = random.sample(samples, target)
+            elif target > len(samples):
+                st.warning("Only {} samples match criteria with {} requested; using all samples that match.".format(len(samples),target))
+                target = len(samples)
         else:
             target = len(samples)
         if background != "":
+            st.write("{} additional background samples requested; adding...".format(int(background)))
             if fformat == "Nextstrain JSON":
                 with open(pref+"_sel.txt","w+") as outf:
                     outf.write("sample\tSelection\n")
@@ -118,10 +115,8 @@ if runbutton:
         subt = t.get_random(target, [s.encode("UTF-8") for s in samples])
     else:
         subt = t.subtree(samples)
-    print("Done with filtering. Looking to make output")
     if fformat == "Nextstrain JSON":
         st.write("Writing Nextstrain JSON file...")
-        print("Writing json.")
         mf = ['public-latest.metadata.tsv']
         if background != "":
             mf.append(pref + "_sel.txt")
@@ -131,9 +126,9 @@ if runbutton:
         with open(pref+'_subt.json', 'r') as f:
             db = st.download_button(label="Download Results", file_name="matgui.json", data=f.read())
             if db:
-                print("Clearing temporary files.")
                 for seshfile in [pref+"_sel.txt", pref+"_subt.json"]:
                     if os.path.exists(seshfile):
+                        print("Clearing temporary file: " + seshfile,file=sys.stderr)
                         os.remove(seshfile)
     elif fformat == "Protobuf":
         st.write("Writing Protobuf file...")
@@ -146,6 +141,7 @@ if runbutton:
                 print("Clearing temporary files.")
                 for seshfile in [pref+"_subt.pb"]:
                     if os.path.exists(seshfile):
+                        print("Clearing temporary file: " + seshfile,file=sys.stderr)
                         os.remove(seshfile)
     #for the prototype deployment, clear the tree and reload on each call due to limited ram.
     t.clear()
