@@ -10,7 +10,7 @@ def retrieve_file(fn):
     if not os.path.exists(fn):
         print("Retrieving data from the UCSC public repository...")
         urllib.request.urlretrieve("http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.all.masked.pb", "public-latest.all.masked.pb")
-        urllib.request.urlretrieve("http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.metadata.tsv.gz", "public-latest.all.metadata.tsv.gz")
+        urllib.request.urlretrieve("http://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.metadata.tsv.gz", "public-latest.metadata.tsv.gz")
         with gzip.open('public-latest.metadata.tsv.gz', 'rb') as f_in:
             with open('public-latest.metadata.tsv', 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
