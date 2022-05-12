@@ -38,7 +38,12 @@ def load_tree(path):
 def subsample(samples, newsamples):
     return samples.intersection(set([s.decode("UTF-8") for s in newsamples]))
 
+#local testing mode for limited ram deployment.
 path = "./testmat.pb"
+with gzip.open('public-latest.metadata.tsv.gz', 'rb') as f_in:
+    with open('public-latest.metadata.tsv', 'wb') as f_out:
+        shutil.copyfileobj(f_in, f_out)
+
 if runbutton:
     t = load_tree(path)
     print(regex, clade, timestart, timeend, fformat)
