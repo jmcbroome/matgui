@@ -112,7 +112,10 @@ if runbutton:
                     outf.write("sample\tSelection\n")
                     outf.write("\tselected\n".join(samples)+'\tselected\n')
             target += int(background)
-        subt = t.get_random(target, [s.encode("UTF-8") for s in samples])
+        if target != len(samples):
+            subt = t.get_random(target, [s.encode("UTF-8") for s in samples])
+        else:
+            subt = t.subtree(samples)
     else:
         subt = t.subtree(samples)
     if fformat == "Nextstrain JSON":
