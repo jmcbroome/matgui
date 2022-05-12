@@ -1,3 +1,4 @@
+from numpy import std
 import streamlit as st
 import bte
 import os
@@ -18,6 +19,8 @@ def retrieve_file(fn):
 
 with st.form(key="matgui"):
     st.title("MATGUI")
+    st.markdown("This webtool allows the user to generate a customized Nextstrain view of the SARS-CoV-2 pandemic by generating an Auspice-compatible JSON.")
+    st.markdown("The JSON files produced by this tool can be uploaded to [Auspice](https://auspice.us/) for viewing. Just download then drag and drop!")
     regex = st.text_input("What samples would you like to include? Pass a valid regex matching your full sample names here (e.g. USA.* matches all samples from the USA)")
     scount = st.text_input("How many samples would you like to include?")
     clade = st.text_input("Would you like to pick a specific clade to use? E.g. B.1.1.7, B.A.2")
