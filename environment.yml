@@ -1,0 +1,8 @@
+name: matgui
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - bte
+  - python=3.8
+  - streamlit
