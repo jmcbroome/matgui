@@ -17,6 +17,7 @@ def retrieve_file(fn):
         st.write("Data successfully downloaded!")
 
 with st.form(key="matgui"):
+    testmode = st.checkbox("Test Mode- use small test dataset?",value=False)
     regex = st.text_input("What samples would you like to include? Pass a valid regex matching your full sample names here (e.g. USA.* matches all samples from the USA)")
     scount = st.text_input("How many samples would you like to include?")
     clade = st.text_input("Would you like to pick a specific clade to use? E.g. B.1.1.7, B.A.2")
@@ -26,7 +27,7 @@ with st.form(key="matgui"):
     fformat = st.selectbox("Choose a file format to export", ("Nextstrain JSON", "Protobuf"))
     runbutton = st.form_submit_button(label='Generate my subtree.')
 
-# @st.experimental_singleton(suppress_st_warning=True)
+@st.experimental_singleton(suppress_st_warning=True)
 def load_tree(path):
     st.write("Loading tree...")
     return bte.MATree(path)
@@ -34,9 +35,13 @@ def load_tree(path):
 def subsample(samples, newsamples):
     return samples.intersection(set([s.decode("UTF-8") for s in newsamples]))
 
-path = "public-latest.all.masked.pb"
+if testmode:
+    path = "./testmat.pb"
+else:
+    path = "public-latest.all.masked.pb"
 if runbutton:
-    retrieve_file(path)
+    if not testmode:
+        retrieve_file(path)
     t = load_tree(path)
     print(regex, clade, timestart, timeend, fformat)
     added = 0
