@@ -30,7 +30,7 @@ with st.form(key="matgui"):
     fformat = st.selectbox("Choose a file format to export", ("Nextstrain JSON", "Protobuf"))
     runbutton = st.form_submit_button(label='Generate my subtree.')
 
-@st.experimental_singleton(suppress_st_warning=True)
+#@st.experimental_singleton(suppress_st_warning=True)
 def load_tree(path):
     st.write("Loading tree...")
     return bte.MATree(path)
@@ -103,3 +103,4 @@ if runbutton:
         st.write("Run complete. Download the result?")
         with open('subt.pb', 'rb') as f:
             st.download_button(label="Download Results", file_name="matgui.pb", data=f.read())
+    t.clear()
