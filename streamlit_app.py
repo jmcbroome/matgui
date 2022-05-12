@@ -27,10 +27,10 @@ def retrieve_file(fn):
 
 with st.form(key="matgui"):
     st.markdown("# MATGUI")
-    st.markdown("This is a test deployment environment for the MATGUI project.")
-    st.markdown("This deployment uses a limited test dataset to demonstrate the functionality of the MATGUI project.")
+    st.markdown("This app is a tool for users to generated customized Nextstrain views in JSON format from the global SARS-CoV-2 tree without needing to use the command line.")
+    st.markdown("WARNING: This test deployment uses a limited dataset of 50,000 samples to demonstrate the functionality of the MATGUI project.")
     st.markdown("A full version of the project using the complete dataset is forthcoming.")
-    st.markdown("The Nextstrain JSON files produced by this tool can be uploaded to [Auspice](https://auspice.us/) for viewing. Just download then drag and drop!")
+    st.markdown("The Nextstrain JSON files produced by this tool can be uploaded to [Auspice](https://auspice.us/) for viewing. Set your parameters and generate, download the result, then drag and drop onto Auspice!")
     samplelist = st.text_area("Paste a list of samples to include, one per line.")
     regex = st.text_input("What category of sample names would you like to include? Pass a valid regex matching your full sample names of interest here (e.g. USA.* matches all samples from the USA)")
     clade = st.text_input("Would you like to select a specific clade? E.g. B.1.1.7, B.A.2")
