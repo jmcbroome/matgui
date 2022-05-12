@@ -37,7 +37,7 @@ with st.form(key="matgui"):
     use_time = st.checkbox("Use time-based filtering?")
     timestart = st.text_input("What is the earliest date you would like to include (e.g. 2020-01-01)? Default is 2019-12-01.",value="2019-12-01")
     timeend = st.text_input("What is the latest date you would like to include (e.g. 2020-01-01)? Default is today.",value=dt.date.today().strftime("%Y-%m-%d"))
-    scount = st.text_input("How many total samples matching your criteria would you like to include in your final output? Default is all.")
+    scount = st.text_input("How many total samples matching your criteria would you like to include in your final output? Leave blank to use all.",value="500")
     background = st.text_input("How many background samples (samples not matching these criteria) would you like to include in your final output? Default is none.")
     fformat = st.selectbox("Choose a file format to export", ("Nextstrain JSON", "Protobuf"))
     runbutton = st.form_submit_button(label='Generate my subtree.')
